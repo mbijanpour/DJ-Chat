@@ -1,9 +1,6 @@
 {
     "editor.defaultFormatter": null,
     "editor.formatOnSave": true,
-    "python.linting.enabled": true,
-    "python.linting.lintOnsave": true,
-    "python.linting.flake8Enabled": true,
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter",
         "editor.formatOnSave": true,
@@ -14,5 +11,14 @@
     "isort.args": [
         "--profile",
         "black"
+    ],
+    "sqltools.useNodeRuntime": true,
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "SQLite",
+            "database": "${workspaceFolder:DJ-Chat}/db.sqlite3"
+        }
     ],
 }
