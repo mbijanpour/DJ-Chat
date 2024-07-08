@@ -16,7 +16,6 @@ class ServerListViewSet(viewsets.ViewSet):
     for each filtering or other operations
     viewset will provide us with a default implementation of CRUD operations
     """
-
     queryset = Server.objects.all()
 
     def list(self, request):
@@ -28,11 +27,19 @@ class ServerListViewSet(viewsets.ViewSet):
 
         # with the get_params we extract the category id from the get request
         category = request.query_params.get("category")
+        by_user  = request.query_params.get("by_user").lower() == "true"
 
         if category:
             self.queryset = self.queryset.filter(
                 category__name=category
             )  # get the object in queryset which have "category"
+            
+        if by_user:
+            user_id = request.user.id
+            
+            self.queryset = self.queryset.filter(
+                member=user_id
+            ) # get the object in queryset which have members with "user_id" value
 
         serializer = ServerSerializer(self.queryset, many=True)
         return Response(serializer.data)
