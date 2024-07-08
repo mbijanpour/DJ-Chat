@@ -21,4 +21,7 @@
             "database": "${workspaceFolder:DJ-Chat}/db.sqlite3"
         }
     ],
+    "cSpell.words": [
+        "viewsets"
+    ],
 }
