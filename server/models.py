@@ -85,6 +85,22 @@ class Server(models.Model):
         return self.name
 
 
+def server_icon_upload_path(instance, filename):
+    """
+    the path media/ has been set in the setting for media files
+    so the path would be something like media/Server...
+    """
+    return f"Server/{instance.id}/server_icon/{filename}"
+
+
+def server_banner_upload_path(instance, filename):
+    """
+    the path media/ has been set in the setting for media files
+    so the path would be something like media/Server...
+    """
+    return f"Server/{instance.id}/server_banner/{filename}"
+
+
 class Channel(models.Model):
     """
     the channel are like small rooms within a server,
@@ -102,17 +118,35 @@ class Channel(models.Model):
     server = models.ForeignKey(
         Server, on_delete=models.PROTECT, related_name="channel_server"
     )  # in the description of the class
+    banner = models.ImageField(
+        upload_to=server_banner_upload_path, null=True, blank=True
+    )
+    icon = models.ImageField(upload_to=server_icon_upload_path, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         """
-        costume save method to save the name of the channel to lower
-        case, as seen the name is only overridden to be lowercase.
+        the DocString is provided in Category section
         """
-        self.name = self.name.lower()
-        # args are just the vars that pass in to the function.
-        # kwargs are the keyword arguments that pass in to the function. (same as arg but with key value pairs)
-        # super is used to call the parent class save method.
-        super(Channel, self).save(*args, **kwargs)
+
+        if self.id:
+            existing = get_object_or_404(Category, id=self.id)
+            if existing.icon != self.icon:
+                existing.icon.delete(save=False)
+            if existing.banner != self.banner:
+                existing.banner.delete(save=False)
+        super(Category, self).save(*args, **kwargs)
+
+    @receiver(models.signals.pre_delete, sender=server)
+    def category_delete_icon_on_delete(sender, instance, using, **kwargs):
+        """
+        the DocString is provided in Category section
+        """
+
+        for field in instance._meta.get_fields():
+            if field.name in ["icon", "banner"]:
+                file = getattr(instance, field.name)
+                if file:
+                    file.delete(save=False)
 
     def __str__(self):
         return self.name
