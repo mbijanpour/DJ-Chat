@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.db.models import Count
 from rest_framework import viewsets
 from rest_framework import response
 from rest_framework.exceptions import ValidationError, AuthenticationFailed
@@ -31,6 +32,7 @@ class ServerListViewSet(viewsets.ViewSet):
         by_user = request.query_params.get("by_user") == "true"
         qty = request.query_params.get("qty")
         by_server_id = request.query_params.get("by_server_id")
+        with_num_members = request.query_params.get("with_num_members") == "true"
         
         # check if the user is authenticated to show the users servers 
         if by_user or by_server_id and not request.user.is_authenticated:
@@ -48,6 +50,12 @@ class ServerListViewSet(viewsets.ViewSet):
             self.queryset = self.queryset.filter(
                 member=user_id
             )  # get the object in queryset which have members with "user_id" value
+            
+        if with_num_members:
+            # we use annotation to perform more complex operations on querysets
+            self.queryset = self.queryset.annotate(
+                num_members=Count("member")
+            )  # it will return the number of members associated with each server
 
         if qty:
             self.queryset = self.queryset[
@@ -73,5 +81,5 @@ class ServerListViewSet(viewsets.ViewSet):
             except ValueError: 
                 raise ValidationError(detail=f"server id {by_server_id} not found (value error).")
 
-        serializer = ServerSerializer(self.queryset, many=True)
+        serializer = ServerSerializer(self.queryset, many=True, context={"num_members": with_num_members})
         return Response(serializer.data)
