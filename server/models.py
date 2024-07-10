@@ -47,7 +47,7 @@ class Category(models.Model):
                 )  # we dont want to save the object here so False.
         super(Category, self).save(*args, **kwargs)
 
-    @receiver(models.signals.pre_delete, sender=Category)
+    @receiver(models.signals.pre_delete, sender="server.Category")
     def category_delete_icon_on_delete(sender, instance, using, **kwargs):
         """
         in this one we want to delete the icon when we delete the category, so we use django signals

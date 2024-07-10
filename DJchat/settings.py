@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     # external apps
     "drf_spectacular",
     "rest_framework",
+    "corsheaders",
     # internal apps
     "account",
     "server",
@@ -56,6 +57,9 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
+    # corsheaders Middleware settings
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -153,3 +157,7 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
